@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <title>Cafeter&iacute;a - Control de &Oacute;rdenes</title>
+        <base href="/comercial/">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/reset.css">
+        <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+        <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css">
+        <link rel="stylesheet" type="text/css" href="css/w3.css">
+        <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
+        <link rel="stylesheet" type="text/css" href="css/classic.css">
+        <link rel="stylesheet" type="text/css" href="css/classic.date.css">
+        <link rel="stylesheet" type="text/css" href="css/otros.css">
+        
+        <!-- Favicon 
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+		<link rel="apple-touch-icon" sizes="57x57" href="image/apple-icon-57x57.png">
+		<link rel="apple-touch-icon" sizes="60x60" href="image/apple-icon-60x60.png">
+		<link rel="apple-touch-icon" sizes="72x72" href="image/apple-icon-72x72.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="image/apple-icon-76x76.png">
+		<link rel="apple-touch-icon" sizes="114x114" href="image/apple-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="image/apple-icon-120x120.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="image/apple-icon-144x144.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="image/apple-icon-152x152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="image/apple-icon-180x180.png">
+		<link rel="icon" type="image/png" sizes="192x192"  href="image/android-icon-192x192.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="image/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="96x96" href="image/favicon-96x96.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="image/favicon-16x16.png">
+		<link rel="manifest" href="image/manifest.json">
+		<meta name="msapplication-TileColor" content="#ffffff">
+		<meta name="msapplication-TileImage" content="image/ms-icon-144x144.png">
+		<meta name="theme-color" content="#ffffff">
+		-->
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <script type="text/javascript" language="javascript" src="js/dropdown.js"></script>
+        <!-- DataTables -->
+        <script type="text/javascript" language="javascript" src="js/jquery.dataTables.js"></script>
+        <!-- jQuery Mask -->
+        <script type="text/javascript" language="javascript" src="js/jquery.mask.min.js"></script>
+        <!-- jQuery DatePicker -->
+        <script type="text/javascript" language="javascript" src="js/picker.js"></script>
+        <script type="text/javascript" language="javascript" src="js/picker.date.js"></script>
+        <script type="text/javascript" language="javascript" src="js/es_ES.js"></script>
+        <!-- Fontawesome -->
+        <script src="https://use.fontawesome.com/b88a17f1bf.js"></script>
+        <!-- ReactJS -->
+        <script src="https://npmcdn.com/react@15.3.0/dist/react.min.js"></script>
+		<script src="https://npmcdn.com/react-dom@15.3.0/dist/react-dom.min.js"></script>
+        <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+        <script type="text/javascript" src="js/moment.min.js"></script>
+        <!-- General -->
+        <script type="text/javascript" src="js/general.js"></script>
+        <script type="text/javascript">
+			$(document).ready(function() {
+				$('.date').mask('0000-00-00');
+				$('.datepicker').pickadate({
+					selectYears: true,
+					selectMonths: true
+					});
+				$('.money').mask("#,##0.00", {reverse: true});
+				$('.email').mask("A", {
+					translation: {
+						"A": { pattern: /[\w@\-.+]/, recursive: true }
+					}
+				});
+			});
+		</script>        
+    </head>
+    <body>
+        <?php
+        use Phalcon\Mvc\Model\Resultset\Simple as Resultset;
+        
+    	/*$usuario = $this->session->get("usuario");
+		if($usuario != null && $usuario != ""){
+			$this->session->set("error", "");
+			$texto = armaMenu($usuario);
+			$u = Usuario::findFirst($usuario);
+			$p = Parametros::findFirst("parametro = 'initialPass'");
+			if($p->valor != $u->clave){
+				echo $texto;
+			}
+						
+		}else{
+			$homepage = "/comercial/";
+			$currentpage = $_SERVER['REQUEST_URI'];
+			$pos = strpos($currentpage, "retry");
+			if($pos === false){
+				if(!($homepage==$currentpage)) {
+					$this->session->set("error", "Debe iniciar Sesi&oacute;n primero");
+					header("Location: /comercial/");
+				}else{
+					$this->session->set("error", "");
+				}	
+			}							
+		}
+		
+		function armaMenu($uid) {
+			$user = Usuario::findFirst("id = $uid");
+			$m = new Menu();
+			$sql = "select * from menu where parent is null and id in (select x.menu from menu_x_rol x where x.rol = '".$user->rol_id."')";
+			$titulos = new Resultset(null, $m, $m->getReadConnection()->query($sql));
+			//$titulos = Menu::find(array("parent is null and id in (select x.menu from menu_x_rol x where x.rol = $user->rol_id)", "order" => "id"));
+	    	$li1 = '<li class="pure-menu-item">';
+	    	$lip = '<li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover pure-menu-link">';
+	    	$a1 = '<a href="';
+	    	$a2 = '" class="pure-menu-link">';
+	    	$afin = '" class="custom-link-exit">';
+	    	$lie = '</a></li>';
+	    	$ul1 = '<ul class="pure-menu-children">';
+	    	$ul2 = '</ul>';
+	    	$html = '
+	    	<div class="pure-menu pure-menu-horizontal">
+			    <ul class="pure-menu-list">';
+	    	foreach ($titulos as $t){
+	    		$sm = new Menu();
+	    		$sql2 = "select * from menu where parent = $t->id and id in (select x.menu from menu_x_rol x where x.rol = '".$user->rol_id."')";
+	    		$smenus = new Resultset(null, $sm, $sm->getReadConnection()->query($sql2));
+	    		//$smenus = Menu::find(array("parent = $t->id  and id in (select x.menu from menu_x_rol x where x.rol = $user->rol_id)", "order" => "id"));
+	    		if(count($smenus) > 0){
+	    			$html = $html.$lip.$t->label.$ul1;
+	    			foreach ($smenus as $sm){
+	    				$html = $html.$li1.$a1.$sm->href.$a2.$sm->label.$lie;
+	    			}
+	    			$html = $html.$ul2;
+	    		}else{
+	    			if($t->id == 99){
+	    				$html = $html.$li1.$a1.$t->href.$afin.$t->label.$lie;
+	    			}else{
+	    				$html = $html.$li1.$a1.$t->href.$a2.$t->label.$lie;
+	    			}
+	    		}    		
+	    	}
+	    	$html = $html.'</ul><div class="logoRight"><img alt="logo" src="images/logo.png"></div></div>';
+	    	return $html;
+	    }*/	 
+		?>
+    	    	
+        <div class="container">
+            <?php echo $this->getContent();?>
+		</div>         
+    </body>
+</html>

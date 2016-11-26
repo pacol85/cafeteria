@@ -1,0 +1,26 @@
+<script type="text/javascript" language="javascript" class="init">
+	$(document).ready(function() {
+		$('#clientes').DataTable();			
+		$('.edit').hide();
+		$('#dept').change(function() {
+			$.ajax({
+				type: "POST",
+				url: "cliente/listMunicipio", 
+				data: {dept: $('#dept').val()},
+				dataType: "json",
+				success: function(result){
+					var jsondata = jQuery.parseJSON(JSON.stringify(result)); 
+					$("#mdiv").html(jsondata.select);
+				}});
+		});
+	} );
+	<?php echo $this->view->js;?>
+</script>
+
+<?php 
+echo $this->view->titulo;
+echo $this->getContent();
+echo $this->view->form;
+echo $this->view->botones;
+echo $this->view->tabla;
+?>
