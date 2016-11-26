@@ -1,7 +1,7 @@
 <?php
 
 defined('APP_PATH') || define('APP_PATH', realpath('.'));
-//modified
+//after reset
 return new \Phalcon\Config(array(
     'database' => array(
         'adapter'     => 'Mysql',
