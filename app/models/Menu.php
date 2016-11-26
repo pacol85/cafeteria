@@ -13,20 +13,44 @@ class Menu extends \Phalcon\Mvc\Model
      *
      * @var string
      */
-    public $label;
+    public $codigo;
 
     /**
      *
      * @var string
      */
-    public $href;
+    public $nombre;
+
+    /**
+     *
+     * @var string
+     */
+    public $descripcion;
+
+    /**
+     *
+     * @var string
+     */
+    public $precio;
+
+    /**
+     *
+     * @var string
+     */
+    public $foto;
+
+    /**
+     *
+     * @var integer
+     */
+    public $disponible;
 
     /**
      * Initialize method for model.
      */
     public function initialize()
     {
-        $this->hasMany('id', 'MenuXRol', 'menu', array('alias' => 'MenuXRol'));
+        $this->hasMany('id', 'Item', 'menu', array('alias' => 'Item'));
     }
 
     /**

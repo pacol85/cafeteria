@@ -13,59 +13,33 @@ class Item extends \Phalcon\Mvc\Model
      *
      * @var string
      */
-    public $marca;
+    public $orden;
 
     /**
      *
      * @var string
      */
-    public $modelo;
+    public $menu;
+
+    /**
+     *
+     * @var integer
+     */
+    public $cantidad;
 
     /**
      *
      * @var string
      */
-    public $descripcion;
-
-    /**
-     *
-     * @var string
-     */
-    public $valor;
-
-    /**
-     *
-     * @var string
-     */
-    public $impuesto;
-
-    /**
-     *
-     * @var string
-     */
-    public $total;
-
-    /**
-     *
-     * @var string
-     */
-    public $minimo;
-
-    /**
-     *
-     * @var string
-     */
-    public $codigo;
+    public $cambios;
 
     /**
      * Initialize method for model.
      */
     public function initialize()
     {
-        $this->hasMany('id', 'Envios', 'item', array('alias' => 'Envios'));
-        $this->hasMany('id', 'ItemXFactura', 'item', array('alias' => 'ItemXFactura'));
-        $this->hasMany('id', 'ItemXSucursal', 'item', array('alias' => 'ItemXSucursal'));
-        $this->hasMany('id', 'OrdenCompra', 'item', array('alias' => 'OrdenCompra'));
+        $this->belongsTo('orden', 'Orden', 'id', array('alias' => 'Orden'));
+        $this->belongsTo('menu', 'Menu', 'id', array('alias' => 'Menu'));
     }
 
     /**

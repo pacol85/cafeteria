@@ -1,6 +1,6 @@
 <?php
 
-class Municipios extends \Phalcon\Mvc\Model
+class Orden extends \Phalcon\Mvc\Model
 {
 
     /**
@@ -13,39 +13,50 @@ class Municipios extends \Phalcon\Mvc\Model
      *
      * @var string
      */
-    public $nombre;
+    public $numero;
 
     /**
      *
      * @var string
      */
-    public $descripcion;
+    public $cliente;
 
     /**
      *
      * @var string
      */
-    public $departamento;
+    public $identificacion;
 
     /**
      *
      * @var string
      */
-    public $fcreacion;
+    public $otros;
 
     /**
      *
      * @var string
      */
-    public $fmod;
+    public $estado;
+
+    /**
+     *
+     * @var string
+     */
+    public $hinicio;
+
+    /**
+     *
+     * @var string
+     */
+    public $hfinal;
 
     /**
      * Initialize method for model.
      */
     public function initialize()
     {
-        $this->hasMany('id', 'Cliente', 'municipio', array('alias' => 'Cliente'));
-        $this->belongsTo('departamento', 'Departamentos', 'id', array('alias' => 'Departamentos'));
+        $this->hasMany('id', 'Item', 'orden', array('alias' => 'Item'));
     }
 
     /**
@@ -55,14 +66,14 @@ class Municipios extends \Phalcon\Mvc\Model
      */
     public function getSource()
     {
-        return 'municipios';
+        return 'orden';
     }
 
     /**
      * Allows to query a set of records that match the specified conditions
      *
      * @param mixed $parameters
-     * @return Municipios[]
+     * @return Orden[]
      */
     public static function find($parameters = null)
     {
@@ -73,7 +84,7 @@ class Municipios extends \Phalcon\Mvc\Model
      * Allows to query the first record that match the specified conditions
      *
      * @param mixed $parameters
-     * @return Municipios
+     * @return Orden
      */
     public static function findFirst($parameters = null)
     {

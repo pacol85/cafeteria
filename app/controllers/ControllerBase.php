@@ -228,8 +228,12 @@ class ControllerBase extends Controller {
 								"onkeyup" => "$n[1]"							
 						) );
 						$elem = $elem."</div><div id=\"livesearch\">";
-						break;						
+						break;
+					case "f" :
+						$elem = $elem.$this->tag->fileField("$n[0]");
+						break;
 				}
+				
 				$elem = $elem . '</div></div>';
 		}
 		return $elem;
