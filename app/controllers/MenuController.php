@@ -31,14 +31,15 @@ class MenuController extends ControllerBase
 					$m->nombre,
 					$m->precio,
 					parent::a(1,"menu/disponible/$m->id", $disp),
-					parent::a(2, "cargarDatos('".$m->id."','".$m->seccion."','".$m->codigo."','".$m->nombre."','".
-							$m->descripcion."','".$m->precio."');", "Editar")." | ".					
+					parent::a(2, "cargarDatos('".$m->id."','".$m->seccion."','".$m->codigo.
+							"','".$m->nombre."','".$m->descripcion."','".$m->precio."');", 
+							"Editar")." | ".					
 					parent::a(1,"menu/eliminar/$m->id", "Eliminar")
 			]);
 		}
 		
 		//js
-		$fields = ["id", "seccion", "codigo", "nombre", "descripcion", "precio"];
+		$fields = ["id", "seccion", "codigo", "nombre", "desc", "precio"];
 		$otros = "";
 		$jsBotones = ["form1", "menu/edit", "menu"];
 		
@@ -71,33 +72,15 @@ class MenuController extends ControllerBase
     		if (true == $this->request->hasFiles() && $this->request->isPost()) {
     			$upload_dir = APP_PATH . '\\public\\img\\';
     		
-    			foreach ($this->request->getUploadedFiles() as $file) {
-    				$file->moveTo($upload_dir . $file->getName());
-    				$menu->foto = $file->getName();
-    			}
+    		foreach ($this->request->getUploadedFiles() as $file) {
+    				if(strlen($file->getName()) > 0){
+    					$punto = strpos($file->getName(), ".");
+    					$menu->foto = $menu->codigo.substr($file->getName(), $punto);
+    					$file->moveTo($upload_dir . $menu->foto);    					
+    				}    				
+    			}    		
+    		}  		
     		
-    		}
-    		
-    		/*if($this->request->hasFiles())
-    		{
-    			$destination = APP_PATH . '\\public\\img\\';
-    			$pictureHandler = new Sirius\Upload\Handler($destination);
-    			$pictureHandler->addRule(Sirius\Upload\Handler::RULE_IMAGE, array('allowed' => array('jpg', 'jpeg', 'png')));
-    			$upload = new Sirius\Upload\HandlerAggregate();
-    			$upload->addHandler('picture', $pictureHandler);
-    			$result = $upload->process($this->request->getUploadedFiles()); 
-				
-    			if ($result) { 
-    				foreach ($result as $key => $file) {
-    					if (!($file->isValid())) {
-    						parent::msg(implode(", ", $file->getMessages()));
-    					}else{
-    						$menu->foto = $file->name;
-    					}
-    				}
-    			}
-    		}
-    		*/
     		if($menu->save()){
     			parent::msg("Men&uacute; creado exitosamente", "s");
     		}else{
@@ -142,19 +125,48 @@ class MenuController extends ControllerBase
     }
     
     public function editAction(){
-    	if(parent::vPost("id")){
-    		$bancos = Bancos::findFirst("id = ".parent::gPost("id"));
-    		$bancos->nombre = parent::gPost("nombre");
-    		$bancos->telefono = parent::gPost("telefono");
-    		$bancos->direccion = parent::gPost("direccion");
-    		if($bancos->update()){
-    			parent::msg("Banco modificado exitosamente", "s");
+    	if(parent::vPost("codigo")){
+    		$cod = parent::gPost("codigo");
+    		$id = parent::gPost("id");
+    		$exist = Menu::find("codigo = '$cod' and not(id = $id)");
+    		if(count($exist) > 0){
+    			parent::msg("El c&oacute;digo ingresado ya existe");
+    			return parent::forward("menu", "index");
+    		}
+    		$nombre = parent::gPost("nombre");
+    		
+    		$menu = Menu::findFirst("id = $id");
+    		$menu->codigo = $cod;
+    		$menu->descripcion = parent::gPost("desc");
+    		$menu->disponible = 1;
+    		$menu->nombre = $nombre;
+    		$menu->precio = parent::gPost("precio");
+    		$menu->seccion = parent::gPost("seccion");
+    		
+    		//Phalcon upload file
+    		if (true == $this->request->hasFiles() && $this->request->isPost()) {
+    			$upload_dir = APP_PATH . '\\public\\img\\';
+    		
+    			foreach ($this->request->getUploadedFiles() as $file) {
+    				if(strlen($file->getName()) > 0){
+    					$punto = strpos($file->getName(), ".");
+    					$menu->foto = $menu->codigo.substr($file->getName(), $punto);
+    					$file->moveTo($upload_dir . $menu->foto);
+    					
+    				}
+    				
+    			}
+    		
+    		}
+    		
+    		if($menu->update()){
+    			parent::msg("Men&uacute; actualizado exitosamente", "s");
     		}else{
-    			parent::msg("Ocurri&oacute; un error durante la operaci&oacute;n");
+    			parent::msg("Ocurri&oacute; un error durante la operación");
     		}
     	}else{
-    		parent::msg("Ocurri&oacute; un error al cargar los Bancos");
+    		parent::msg("El campo c&oacute; no puede quedar en blanco");
     	}
-    	parent::forward("bancos", "index");
+    	parent::forward("menu", "index");
     }
 }
