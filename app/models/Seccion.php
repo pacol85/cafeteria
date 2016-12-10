@@ -1,6 +1,6 @@
 <?php
 
-class Menu extends \Phalcon\Mvc\Model
+class Seccion extends \Phalcon\Mvc\Model
 {
 
     /**
@@ -13,51 +13,20 @@ class Menu extends \Phalcon\Mvc\Model
      *
      * @var string
      */
-    public $codigo;
-
-    /**
-     *
-     * @var string
-     */
     public $nombre;
 
     /**
      *
      * @var string
      */
-    public $descripcion;
-
-    /**
-     *
-     * @var string
-     */
-    public $precio;
-
-    /**
-     *
-     * @var string
-     */
-    public $foto;
-
-    /**
-     *
-     * @var integer
-     */
-    public $disponible;
-
-    /**
-     *
-     * @var string
-     */
-    public $seccion;
+    public $desc;
 
     /**
      * Initialize method for model.
      */
     public function initialize()
     {
-        $this->hasMany('id', 'Item', 'menu', array('alias' => 'Item'));
-        $this->belongsTo('seccion', 'Seccion', 'id', array('alias' => 'Seccion'));
+        $this->hasMany('id', 'Menu', 'seccion', array('alias' => 'Menu'));
     }
 
     /**
@@ -67,14 +36,14 @@ class Menu extends \Phalcon\Mvc\Model
      */
     public function getSource()
     {
-        return 'menu';
+        return 'seccion';
     }
 
     /**
      * Allows to query a set of records that match the specified conditions
      *
      * @param mixed $parameters
-     * @return Menu[]
+     * @return Seccion[]
      */
     public static function find($parameters = null)
     {
@@ -85,7 +54,7 @@ class Menu extends \Phalcon\Mvc\Model
      * Allows to query the first record that match the specified conditions
      *
      * @param mixed $parameters
-     * @return Menu
+     * @return Seccion
      */
     public static function findFirst($parameters = null)
     {

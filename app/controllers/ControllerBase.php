@@ -346,11 +346,11 @@ class ControllerBase extends Controller {
 	public function jsBotones($form, $action1, $action2){
 		$html = "
 		function guardarCambio(){
-			$('#$form').attr('action', '/comercial/$action1');
+			$('#$form').attr('action', '/cafeteria/$action1');
 			$('#$form').submit();
 		}
 		function cancelar(){
-			$('#$form').attr('action', '/comercial/$action2');
+			$('#$form').attr('action', '/cafeteria/$action2');
 			$('#$form').submit();
 		}
 		";

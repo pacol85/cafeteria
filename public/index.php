@@ -22,6 +22,11 @@ try {
     include APP_PATH . "/app/config/services.php";
 
     /**
+     * Autoload de Vendor para Composer
+     */
+    include APP_PATH . "/vendor/autoload.php";
+    
+    /**
      * Handle the request
      */
     $application = new \Phalcon\Mvc\Application($di);
