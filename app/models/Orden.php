@@ -50,6 +50,12 @@ class Orden extends \Phalcon\Mvc\Model
      * @var string
      */
     public $hfinal;
+    
+    /**
+     *
+     * @var integer
+     */
+    public $prioridad;
 
     /**
      * Initialize method for model.

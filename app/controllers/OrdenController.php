@@ -4,50 +4,16 @@ class OrdenController extends ControllerBase
     public function indexAction()
     {
 		parent::limpiar();
-		$secciones = Seccion::find();
-    	$campos = [
-    			["sdb", ["seccion", $secciones, ["id", "nombre"]], "Seccion"],
-    			["t", ["codigo"], "C&oacute;digo"],
-				["t", ["nombre"], "Nombre"],
-				["h", ["id"], ""],
-				["t", ["desc"], "Descripci&oacute;n"],
-				["m", ["precio", 0], "Precio"],
-    			["f", ["foto"], "Foto"],
-				["s", ["guardar"], "Guardar"]
-		];
-		$head = ["Secci&oacute;n", "C&oacute;digo", "Nombre", "Precio","Disponible", "Acciones"];
-		$tabla = parent::thead("menu", $head);
-		$menu = Menu::find();
-		
-		foreach ($menu as $m){
-			$s = Seccion::findFirst("id = ".$m->seccion);
-			$disp = "S&iacute;";
-			if($m->disponible != 1){
-				$disp = "No";
-			}
-			$tabla = $tabla.parent::tbody([
-					$s->nombre,
-					$m->codigo,
-					$m->nombre,
-					$m->precio,
-					parent::a(1,"menu/disponible/$m->id", $disp),
-					parent::a(2, "cargarDatos('".$m->id."','".$m->seccion."','".$m->codigo.
-							"','".$m->nombre."','".$m->descripcion."','".$m->precio."');", 
-							"Editar")." | ".					
-					parent::a(1,"menu/eliminar/$m->id", "Eliminar")
-			]);
-		}
-		
-		//js
-		$fields = ["id", "seccion", "codigo", "nombre", "desc", "precio"];
-		$otros = "";
-		$jsBotones = ["form1", "menu/edit", "menu"];
-		
-		
-    	$form = parent::multiForm($campos, "menu/guardar", "form1");
-    	$tabla = parent::ftable($tabla);
-    
-    	parent::view("Men&uacute;", $form, $tabla, [$fields, $otros, $jsBotones]);
+		$campos = [
+    			["t", ["numero"], "N&uacute;mero"],
+				["t", ["cliente"], "Cliente"],
+    			["t", ["ident"], "Descripci&oacute;n"],    			
+    			["t", ["otros"], "Cambios"],
+    			["s", ["crear"], "Crear"]
+    	];
+    	
+		$form = parent::formCafe($campos, 4 , "orden/crear", "form1");
+    	parent::view("Orden", $form);
     }
     
     public function guardarAction(){

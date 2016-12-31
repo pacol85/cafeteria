@@ -48,7 +48,16 @@ class ControllerBase extends Controller {
 		$elem = "";
 		switch ($t) {
 			case "i" :
-				$elem = $elem . "<img id='$n[0]' src='$l' onclick ='$n[1]'>";
+				if(count($n)> 2){
+					$elem = $elem."<b>$l</b><br>";
+					$elem = $elem . "<img id='$n[0]' src='$l' onclick ='$n[1]' height='$n[2]' width='$n[3]'>";
+					$elem = $elem . $this->tag->hiddenField ( array (
+						n."$n[0]",
+						"value" => 0 
+				) );
+				}else{
+					$elem = $elem . "<img id='$n[0]' src='$l' onclick ='$n[1]'>";
+				}				
 				break;
 			case "hr" :
 				$elem = $elem . "<hr>";
@@ -527,5 +536,53 @@ class ControllerBase extends Controller {
 	 */
 	public function limpiar(){
 		$this->tag->resetInput();
+	}
+	
+	/**
+	 * Form con menú de cafetería
+	 */
+	public function formCafe($campos, $posMenu, $action, $id = "id") {
+		$form = $this->tag->form ( array (
+				$action,
+				"autocomplete" => "off",
+				"class" => "form-horizontal",
+				"id" => "$id"
+		) );
+	
+		//counter para la posición del menú
+		$counter = 1;
+		
+		foreach ( $campos as $c ) {
+			$elem = "";
+			if($counter == $posMenu){
+				$elem = $elem . ControllerBase::loadMenu ();
+			}
+			if (count ( $c ) > 3) {
+				$elem = $elem . ControllerBase::elemento ( $c [0], $c [1], $c [2], $c [3] );
+			} else
+				$elem = $elem . ControllerBase::elemento ( $c [0], $c [1], $c [2] );
+			$form = $form . $elem;
+			$counter++;
+		}
+	
+		$form = $form . $this->tag->endForm ();
+		return $form;
+	}
+	
+	public function loadMenu(){
+		$hm = "";
+		
+		//menu a cargar agrupado por sección
+		$menu = Menu::find(["order" => "seccion"]);
+		foreach ($menu as $m){
+			$elem = "<b>$m->nombre</b><div id='d$m->id'></div><br>";
+			$elem = $elem . "<img id='$m->id' src='img/$m->foto' onClick ='addHidden(\"n$m->id\")' height='20%' width='20%'>";
+			$elem = $elem . $this->tag->hiddenField ( array (
+					"n$m->id",
+					"value" => 0
+			) );
+			$hm = $hm.$elem;
+		}
+		return $hm;
 	}
 }
