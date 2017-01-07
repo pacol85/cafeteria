@@ -1,8 +1,10 @@
 <script type="text/javascript">
 	function addHidden(id){
-		var tot = $(id).val();
+		var tot = parseInt($("#n"+id).val());
+		alert(tot);
 		tot = tot + 1;
-		$(id).val(tot); 
+		$("#n"+id).val(tot);
+		$("#d"+id).text(tot); 
 	};
 </script>
 
