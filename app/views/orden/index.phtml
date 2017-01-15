@@ -1,15 +1,48 @@
 <script type="text/javascript">
 	function addHidden(id){
 		var tot = parseInt($("#n"+id).val());
-		alert(tot);
 		tot = tot + 1;
 		$("#n"+id).val(tot);
-		$("#d"+id).text(tot); 
+		$("#d"+id).val(tot); 
 	};
-</script>
 
+	function remHidden(id){
+		var tot = parseInt($("#n"+id).val());
+		if(tot <= 0){
+			tot = 0;
+		}else{
+			tot = tot - 1;
+		}
+		$("#n"+id).val(tot);
+		$("#d"+id).val(tot); 
+	};
+
+	$(document).ready(function() {
+		$('#orden').DataTable();	
+		$('#plus').hide();	
+	} );
+
+	function hideForm() {
+		$("#hform").hide();
+		$("#plus").show();
+	}
+
+	function showForm() {
+		$("#plus").hide();
+	}
+</script>
+<link rel="stylesheet" type="text/css" href="css/orden.css">
 <?php 
 echo $this->view->titulo;
-echo $this->getContent();
+echo $this->getContent(); 
+?>
+<div id="hform" class="hform">
+<?php 
 echo $this->view->form;
+?>
+<a onClick ="hideForm();" class="btn btn-info btn-lg"><span class="glyphicon glyphicon-minus" ></span></a>
+</div>
+<a onClick ="showForm();" class="btn btn-info btn-lg"><span id="plus" class="glyphicon glyphicon-plus"></span></a>
+<?php 
+echo $this->view->tabla;
 ?>

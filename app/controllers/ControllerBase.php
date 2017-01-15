@@ -570,9 +570,21 @@ class ControllerBase extends Controller {
 	}
 	
 	public function loadMenu(){
-		$hm = "<table id='tmenu' width='80%'><tbody>";
-		//cada fila 3 columnas
-		$cols = 3;
+		/*
+	<div id="image_preview" class="row">  
+    <div class='crop col-xs-12 col-sm-6 col-md-6 '>
+         <img class="col-xs-12 col-sm-6 col-md-6" 
+          id="preview0" src='img/preview_default.jpg'/>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-6">
+         more stuff
+    </div>
+
+</div> <div class='col-sm-12'>
+		 */
+		$hm = "<table id='tmenu' class='tmenu'><tbody>";
+		//cada fila 4 columnas
+		$cols = 4;
 		$c = 1;
 		//menu a cargar agrupado por sección
 		$menu = Menu::find(["order" => "seccion"]);
@@ -580,12 +592,15 @@ class ControllerBase extends Controller {
 			if($c == 1){
 				$hm = $hm."<tr>";
 			}
-			$elem = "<td><b>$m->nombre</b><div id='d$m->id'></div><br>";
+			$elem = "<td><b>$m->nombre</b><br>";
 			if($m->foto == "" || $m->foto == NULL){
-				$elem = $elem . "<img id='$m->id' src='img/notFound.png' onClick ='addHidden(\"$m->id\");' height='20%' width='20%'>";
+				$elem = $elem . "<img id='$m->id' src='img/notFound.png'>";
 			}else{
-				$elem = $elem . "<img id='$m->id' src='img/$m->foto' onClick ='addHidden(\"$m->id\");' height='20%' width='20%'>";
-			}			
+				$elem = $elem . "<img id='$m->id' src='img/$m->foto'>";
+			}
+			$elem = $elem. "<br><div class='mp'><a onClick =\"remHidden('$m->id');\" class=\"btn btn-info btn-lg\"><span class=\"glyphicon glyphicon-minus\"></span></a>";
+			$elem = $elem. "<input type='text' id='d$m->id' class='txt'\>";
+			$elem = $elem. "<a onClick =\"addHidden('$m->id');\" class=\"btn btn-info btn-lg\"><span class=\"glyphicon glyphicon-plus\"></span></a></div>";			
 			$elem = $elem . $this->tag->hiddenField ( array (
 					"n$m->id",
 					"value" => 0
@@ -602,7 +617,7 @@ class ControllerBase extends Controller {
 		if($c == 1){
 			$hm = $hm."</tr>";
 		}
-		$hm = $hm."</tbody></table>";
+		$hm = $hm."</tbody></table><br>";
 		return $hm;
 	}
 }
