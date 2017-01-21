@@ -1,0 +1,62 @@
+<script type="text/javascript">
+	function addHidden(id){
+		var tot = parseInt($("#n"+id).val());
+		tot = tot + 1;
+		$("#n"+id).val(tot);
+		$("#d"+id).val(tot); 
+	};
+
+	function remHidden(id){
+		var tot = parseInt($("#n"+id).val());
+		if(tot <= 0){
+			tot = 0;
+		}else{
+			tot = tot - 1;
+		}
+		$("#n"+id).val(tot);
+		$("#d"+id).val(tot); 
+	};
+
+	$(document).ready(function() {
+		$('#tordenes').DataTable();	
+		$('#plus').hide();	
+	} );
+
+	function hideForm() {
+		$("#hform").hide();
+		$("#plus").show();
+	}
+
+	function showForm() {
+		$("#plus").hide();
+		$("#hform").show();
+	}
+</script>
+<link rel="stylesheet" type="text/css" href="css/cocina.css">
+<?php 
+echo $this->view->titulo;
+echo $this->getContent(); 
+?>
+<div class="divTable">
+<div class="divTableBody">
+<div class="divTableRow">
+<div class="divTableHead">Total de platos a preparar</div>
+</div>
+<div class="divTableRow">
+<div class="divTableCell">Hamburguesa</div>
+<div class="divTableCell">5</div>
+<div class="divTableCell">Pollo Empanizado</div>
+<div class="divTableCell">9</div>
+</div>
+<div class="divTableRow">
+<div class="divTableCell">San Rafael</div>
+<div class="divTableCell">1</div>
+<div class="divTableCell">Tipico</div>
+<div class="divTableCell">3</div>
+</div>
+</div>
+</div>
+
+<?php 
+echo $this->view->tabla;
+?>

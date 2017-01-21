@@ -164,4 +164,39 @@ class OrdenController extends ControllerBase
     	}
     	parent::forward("menu", "index");
     }
+    
+    public function cocinaAction()
+    {
+    	$campos = [
+    			["t", ["numero"], "N&uacute;mero"],
+    			["t", ["cliente"], "Cliente"],
+    			["t", ["ident"], "Descripci&oacute;n"],
+    			["t", ["otros"], "Cambios"],
+    			["s", ["crear"], "Crear"]
+    	];
+    	 
+    	$form = parent::formCafe($campos, 4 , "orden/crear", "form1");
+    
+    	//tabla
+    	$head = ["N&uacute;mero", "Orden", "Cambios", "Acciones"];
+    	$tabla = parent::thead("orden", $head);
+    	$ordenes = Orden::find("hinicio > curdate()");
+    	foreach ($ordenes as $o){
+    		$items = Item::find("orden = $o->id");
+    		$ordenado = "";
+    		foreach ($items as $i){
+    			$m = Menu::findFirst("id = $i->menu");
+    			$ordenado = $ordenado."$m->nombre: $i->cantidad, ";
+    		}
+    		$ordenado = substr($ordenado, 0, strlen($ordenado)-2);
+    		$tabla = $tabla.parent::tbody([
+    				$o->numero,
+    				$ordenado,
+    				$o->otros,
+    				"Pendiente"
+    		]);
+    	}
+    
+    	parent::view("Orden", $form, $tabla);
+    }
 }

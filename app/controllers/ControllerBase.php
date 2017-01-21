@@ -620,4 +620,49 @@ class ControllerBase extends Controller {
 		$hm = $hm."</tbody></table><br>";
 		return $hm;
 	}
+	
+	public function loadCocinaTotal(){
+		$hm = "<div class='form-group main'><div class='col-sm-12' align='center' >";
+		$hm = $hm . "<table id='tmenu' class='tmenu'><tbody>";
+		//cada fila 4 columnas, se mostrará item y luego total, así emparejados por cada fila 2 items
+		$cols = 4;
+		$c = 1;
+		//menu a cargar agrupado por sección
+		//
+		$menu = Menu::find(["order" => "seccion"]);
+		$elem = "";
+		foreach ($menu as $m){
+			switch ($c){
+				case 1:
+					$hm = $hm."<tr>";
+					$elem = $elem."<td><b>$m->nombre</b><br>";
+					$elem = $elem."</td>";						
+					$c++;
+					break;
+				case 2:
+					$orden = Orden::find("hinicio > curdate() and menu = $m->id and estado < 4");
+					$elem = $elem."<td><b>$m->nombre</b><br>";
+					$elem = $elem."</td>";
+					$c++;
+					break;
+				case 3:
+					$elem = $elem."<td><b>$m->nombre</b><br>";
+					$elem = $elem."</td>";
+					$c++;
+					break;
+				case 4:
+					$orden = Orden::find("hinicio > curdate() and menu = $m->id and estado < 4");
+					$elem = $elem."</td>";
+					$hm = $hm."</tr>";
+					$c = 1;
+					break;
+				
+			}
+			$hm = $hm.$elem;
+			
+		}
+		
+		$hm = $hm."</tbody></table></div></div><br>";
+		return $hm;
+	}
 }

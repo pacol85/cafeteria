@@ -1,0 +1,36 @@
+@CHARSET "ISO-8859-1";
+/*images with the same height*/
+.crop {
+    /*height: 300px;*/
+    width: 25%;
+    overflow: hidden;
+}
+.crop img {
+    height: 100%;
+    width: auto;
+}
+
+.txt {
+	text-align: center;
+	size: 2px;
+	width: 50px;
+}
+
+.tmenu {
+	width: 100%;
+}
+
+.tmenu td {
+	width: 25%;
+	height: 150px;
+	text-align: center;
+}
+
+img {
+	width: 80%;
+	height: 80%;
+}
+
+.mp {
+	width: 100%;
+}

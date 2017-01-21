@@ -29,6 +29,7 @@
 
 	function showForm() {
 		$("#plus").hide();
+		$("#hform").show();
 	}
 </script>
 <link rel="stylesheet" type="text/css" href="css/orden.css">
@@ -40,9 +41,11 @@ echo $this->getContent();
 <?php 
 echo $this->view->form;
 ?>
-<a onClick ="hideForm();" class="btn btn-info btn-lg"><span class="glyphicon glyphicon-minus" ></span></a>
+<a onClick ="hideForm();" class="btn btn-info btn-lg"><span class="glyphicon glyphicon-chevron-up" ></span></a>
 </div>
-<a onClick ="showForm();" class="btn btn-info btn-lg"><span id="plus" class="glyphicon glyphicon-plus"></span></a>
+<div id="plus">
+<a onClick ="showForm();" class="btn btn-info btn-lg"><span class="glyphicon glyphicon-chevron-down"></span></a>
+</div>
 <?php 
 echo $this->view->tabla;
 ?>
