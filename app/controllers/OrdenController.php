@@ -12,26 +12,50 @@ class OrdenController extends ControllerBase
     			["s", ["crear"], "Crear"]
     	];
     	
-		$form = parent::formCafe($campos, 4 , "orden/crear", "form1");
+		$form = parent::formCafe($campos, 3 , "orden/crear", "form1");
 		
 		//tabla
-		$head = ["N&uacute;mero", "Orden", "Cambios", "Acciones"];
+		$head = ["N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
 		$tabla = parent::thead("orden", $head);
-		$ordenes = Orden::find("hinicio > curdate()");
+		$ordenes = Orden::find(["hinicio > curdate() and estado < 5", "order" => "prioridad desc"]);
 		foreach ($ordenes as $o){
 			$items = Item::find("orden = $o->id");
+			$estado = Orderstatus::findFirst("id = $o->estado");
 			$ordenado = "";
 			foreach ($items as $i){
 				$m = Menu::findFirst("id = $i->menu");
 				$ordenado = $ordenado."$m->nombre: $i->cantidad, ";
 			}
 			$ordenado = substr($ordenado, 0, strlen($ordenado)-2);
-			$tabla = $tabla.parent::tbody([
+			
+			$accion = "";
+			switch ($o->estado){
+				case 3:
+					$accion = parent::a(1, "orden/estadoOrden/$o->id", "Siguiente Paso") ." | ".
+							parent::a(1, "orden/cancelarOrden/$o->id", "Cancelar");
+				break;
+				case 4:
+					$accion = parent::a(1, "orden/prioridad/$o->id", "Prioridad");
+				break;
+				default:
+					$accion = parent::a(1, "orden/cancelarOrden/$o->id", "Cancelar") ." | ".
+					$accion = parent::a(1, "orden/prioridad/$o->id", "Prioridad");
+				break;
+			}
+
+			$col = [
 					$o->numero, 
 					$ordenado, 
-					$o->otros, 
-					"Pendiente"					
-			]);
+					$o->otros,
+					$estado->estado, 
+					$accion		
+			];
+			if($o->prioridad > 0) {
+				$tabla = $tabla.parent::tbodyClass($col, "prioridad");
+			}else{
+				$tabla = $tabla.parent::tbody($col);;
+			}
+			
 		}
 		
     	parent::view("Orden", $form, $tabla);
@@ -85,6 +109,48 @@ class OrdenController extends ControllerBase
     		parent::msg("El n&uacute;mero de orden no puede quedar en blanco");
     	}
     	parent::forward("orden", "index");
+    }
+    
+    /**
+     * CAmbiar estado a Entregado
+     * @param id de orden $oid
+     */
+    function estadoOrdenAction($oid){
+    	$orden = Orden::findFirst("id = $oid");
+    	$orden->estado = $orden->estado + 1;
+    	$orden->hfinal = parent::fechaHoy(true);
+    	if($orden->update()){
+    		parent::msg("Orden $orden->numero entregada al cliente", "s");
+    		return parent::forward("orden", "index");
+    	}
+    }
+    
+    /**
+     * Cambiar estado a cancelado
+     * @param id de orden $oid
+     */
+    function cancelarOrdenAction($oid){
+    	$orden = Orden::findFirst("id = $oid");
+    	$orden->estado = 5;
+    	$orden->hfinal = parent::fechaHoy(true);
+    	if($orden->update()){
+    		parent::msg("Orden $orden->numero cancelada", "s");
+   			return parent::forward("orden", "index");
+    	}
+    }
+    
+    /**
+     * CAmbiar prioridad
+     * @param id de orden $oid
+     */
+    function prioridadAction($oid){
+    	$orden = Orden::findFirst("id = $oid");
+    	$prioridadMax = Orden::maximum(["column" => "prioridad", "conditions" => "hinicio > curdate() and estado < 5"]);
+    	$orden->prioridad = $prioridadMax + 1;
+    	if($orden->update()){
+    		parent::msg("Se modific&oacute; prioridad de orden: $orden->numero", "n");
+    		return parent::forward("orden", "index");
+    	}
     }
     
     public function eliminarAction($id){
@@ -167,36 +233,55 @@ class OrdenController extends ControllerBase
     
     public function cocinaAction()
     {
-    	$campos = [
-    			["t", ["numero"], "N&uacute;mero"],
-    			["t", ["cliente"], "Cliente"],
-    			["t", ["ident"], "Descripci&oacute;n"],
-    			["t", ["otros"], "Cambios"],
-    			["s", ["crear"], "Crear"]
-    	];
-    	 
-    	$form = parent::formCafe($campos, 4 , "orden/crear", "form1");
+    	$form = parent::formCocina("orden/cocinados", "form1");
     
     	//tabla
-    	$head = ["N&uacute;mero", "Orden", "Cambios", "Acciones"];
-    	$tabla = parent::thead("orden", $head);
-    	$ordenes = Orden::find("hinicio > curdate()");
+    	$head = ["N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
+    	$tabla = parent::thead("tordenes", $head);
+    	$ordenes = Orden::find("hinicio > curdate() and estado < 3");
+    	$pos = 1;
     	foreach ($ordenes as $o){
     		$items = Item::find("orden = $o->id");
     		$ordenado = "";
+    		$estado = Orderstatus::findFirst("id = $o->estado");
     		foreach ($items as $i){
     			$m = Menu::findFirst("id = $i->menu");
     			$ordenado = $ordenado."$m->nombre: $i->cantidad, ";
     		}
     		$ordenado = substr($ordenado, 0, strlen($ordenado)-2);
-    		$tabla = $tabla.parent::tbody([
-    				$o->numero,
-    				$ordenado,
-    				$o->otros,
-    				"Pendiente"
-    		]);
+    		$col = [
+    		$o->numero,
+    		$ordenado,
+    		$o->otros,
+    		$estado->estado,
+    		parent::a(1, "orden/estadoCocina/$o->id", "Siguiente Paso")
+    		];
+    		switch ($pos) {
+    			case 1:
+    				$tabla = $tabla.parent::tbodyClass($col, "uno");
+    				break;
+    			case 2:
+    				$tabla = $tabla.parent::tbodyClass($col, "dos");
+    				break;
+    			default:
+    				$tabla = $tabla.parent::tbody($col);;
+    				break;
+    		}
+    		$pos = $pos + 1;
+    		
     	}
     
-    	parent::view("Orden", $form, $tabla);
+    	parent::view("Cocina", $form, $tabla);
+    }
+    
+    function estadoCocinaAction($oid){
+    	$orden = Orden::findFirst("id = $oid");
+    	$orden->estado = $orden->estado + 1;
+    	if($orden->update()){
+    		if($orden->estado == 3){
+    			parent::msg("Orden $orden->numero cocinada y entregada a caja", "s");
+    		}
+    		return parent::forward("orden", "cocina");
+    	}
     }
 }

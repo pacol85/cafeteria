@@ -22,8 +22,9 @@
 
 .tmenu td {
 	width: 25%;
-	height: 150px;
+	/*height: 150px;*/
 	text-align: center;
+	font-size: 1.5em;
 }
 
 img {
@@ -33,4 +34,19 @@ img {
 
 .mp {
 	width: 100%;
+}
+
+.counter {
+	position: absolute;
+	right: 25px;
+	top: 25px;
+	font-size: 1em;
+}
+
+.uno {
+	font-size: 1.8em;
+}
+
+.dos {
+	font-size: 1.5em;
 }

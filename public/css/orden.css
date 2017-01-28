@@ -34,3 +34,14 @@ img {
 .mp {
 	width: 100%;
 }
+
+.prioridad {
+	color: #ffff80;
+}
+
+.counter {
+	position: absolute;
+	right: 25px;
+	top: 25px;
+	font-size: 1em;
+}

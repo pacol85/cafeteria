@@ -621,6 +621,23 @@ class ControllerBase extends Controller {
 		return $hm;
 	}
 	
+	/**
+	 * Form con menú de cocina
+	 */
+	public function formCocina($action, $id = "id") {
+		$form = $this->tag->form ( array (
+				$action,
+				"autocomplete" => "off",
+				"class" => "form-horizontal",
+				"id" => "$id"
+		) );
+	
+		$form = $form . $this->loadCocinaTotal();
+	
+		$form = $form . $this->tag->endForm ();
+		return $form;
+	}
+	
 	public function loadCocinaTotal(){
 		$hm = "<div class='form-group main'><div class='col-sm-12' align='center' >";
 		$hm = $hm . "<table id='tmenu' class='tmenu'><tbody>";
@@ -632,37 +649,58 @@ class ControllerBase extends Controller {
 		$menu = Menu::find(["order" => "seccion"]);
 		$elem = "";
 		foreach ($menu as $m){
+			
 			switch ($c){
 				case 1:
 					$hm = $hm."<tr>";
-					$elem = $elem."<td><b>$m->nombre</b><br>";
-					$elem = $elem."</td>";						
-					$c++;
+					$elem = $elem."<td><b>$m->nombre</b></td>";
+					$orden = Orden::find("hinicio > curdate()and estado < 3");
+					$total = 0;
+					foreach ($orden as $o){
+						$i = Item::findFirst("orden = $o->id and menu = $m->id");
+						if($i != null){
+							$total = $total + number_format($i->cantidad, 0);
+						}
+					}
+					$elem = $elem."<td><b>$total</b></td>";
+					$c = $c+1;
 					break;
 				case 2:
-					$orden = Orden::find("hinicio > curdate() and menu = $m->id and estado < 4");
-					$elem = $elem."<td><b>$m->nombre</b><br>";
-					$elem = $elem."</td>";
-					$c++;
-					break;
-				case 3:
-					$elem = $elem."<td><b>$m->nombre</b><br>";
-					$elem = $elem."</td>";
-					$c++;
-					break;
-				case 4:
-					$orden = Orden::find("hinicio > curdate() and menu = $m->id and estado < 4");
-					$elem = $elem."</td>";
-					$hm = $hm."</tr>";
+					$elem = $elem."<td><b>$m->nombre</b></td>";
+					$orden = Orden::find("hinicio > curdate()and estado < 4");
+					$total = 0;
+					foreach ($orden as $o){
+						$i = Item::findFirst("orden = $o->id and menu = $m->id");
+						if($i != null){
+							$total = $total + number_format($i->cantidad, 0);
+						}						
+					}
+					$elem = $elem."<td><b>$total</b></td></tr>";
 					$c = 1;
+					$hm = $hm.$elem;
+					$elem = "";
 					break;
+					
 				
 			}
-			$hm = $hm.$elem;
+			
 			
 		}
 		
 		$hm = $hm."</tbody></table></div></div><br>";
 		return $hm;
+	}
+	
+	/**
+	 * Crear fila con clase específica
+	 * @param String $col
+	 * @param String $class
+	 * @return string
+	 */
+	public function tbodyClass($col, $class) {
+		$tr = "<tr class='$class'>";
+		$tr = $tr . $this->td ( $col );
+		$tr = $tr . "</tr>";
+		return $tr;
 	}
 }
