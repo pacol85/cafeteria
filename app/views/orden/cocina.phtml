@@ -18,7 +18,9 @@
 	};
 
 	$(document).ready(function() {
-		$('#tordenes').DataTable();	
+		$('#tordenes').DataTable({
+			"aaSorting": [[ 0, "desc" ]]
+			});	
 		$('#plus').hide();
 
 		var counter = 120;

@@ -18,7 +18,9 @@
 	};
 
 	$(document).ready(function() {
-		$('#orden').DataTable();	
+		$('#orden').DataTable({
+			"aaSorting": [[ 0, "desc" ]]
+			});	
 		$('#plus').hide();
 
 		var counter = 120;

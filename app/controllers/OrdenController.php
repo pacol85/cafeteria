@@ -15,7 +15,7 @@ class OrdenController extends ControllerBase
 		$form = parent::formCafe($campos, 3 , "orden/crear", "form1");
 		
 		//tabla
-		$head = ["N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
+		$head = ["P","N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
 		$tabla = parent::thead("orden", $head);
 		$ordenes = Orden::find(["hinicio > curdate() and estado < 5", "order" => "prioridad desc"]);
 		foreach ($ordenes as $o){
@@ -44,6 +44,7 @@ class OrdenController extends ControllerBase
 			}
 
 			$col = [
+					$o->prioridad, 
 					$o->numero, 
 					$ordenado, 
 					$o->otros,
@@ -236,9 +237,9 @@ class OrdenController extends ControllerBase
     	$form = parent::formCocina("orden/cocinados", "form1");
     
     	//tabla
-    	$head = ["N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
+    	$head = ["P", "N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
     	$tabla = parent::thead("tordenes", $head);
-    	$ordenes = Orden::find("hinicio > curdate() and estado < 3");
+    	$ordenes = Orden::find("hinicio > curdate() and estado < 3 order by prioridad desc");
     	$pos = 1;
     	foreach ($ordenes as $o){
     		$items = Item::find("orden = $o->id");
@@ -250,6 +251,7 @@ class OrdenController extends ControllerBase
     		}
     		$ordenado = substr($ordenado, 0, strlen($ordenado)-2);
     		$col = [
+    		$o->prioridad, 
     		$o->numero,
     		$ordenado,
     		$o->otros,
