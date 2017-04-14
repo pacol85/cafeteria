@@ -1,4 +1,6 @@
 <script type="text/javascript">
+    var pause = false;
+    
 	function addHidden(id){
 		var tot = parseInt($("#n"+id).val());
 		tot = tot + 1;
@@ -30,11 +32,23 @@
 				  //alert("termino counter");
 				  this.document.location.href = "/cafeteria/orden";
 			  }
-			  counter--;
+                          if(pause == false){
+                            counter--;			      
+                          }
 			  setTimeout(timer,1000);
 			};
 		timer();	
 	} );
+        
+        function pauseCounter(){
+            pause = true;
+            $('div.b_pause').html("<span class=\"glyphicon glyphicon-play\" onclick=\"playCounter();\">");
+        }
+        
+        function playCounter(){
+            pause = false;
+            $('div.b_pause').html("<span class=\"glyphicon glyphicon-pause\" onclick=\"pauseCounter();\">");
+        }
 
 	function hideForm() {
 		$("#hform").hide();
@@ -64,3 +78,4 @@ echo $this->view->form;
 echo $this->view->tabla;
 ?>
 <div id="counter" name="counter" class="counter"></div>
+<div id="b_pause" name="b_pause" class="b_pause"><span class="glyphicon glyphicon-pause" onclick="pauseCounter();"></span></div>

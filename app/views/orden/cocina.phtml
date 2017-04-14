@@ -1,5 +1,5 @@
 <script type="text/javascript">
-	function addHidden(id){
+	/*function addHidden(id){
 		var tot = parseInt($("#n"+id).val());
 		tot = tot + 1;
 		$("#n"+id).val(tot);
@@ -16,25 +16,60 @@
 		$("#n"+id).val(tot);
 		$("#d"+id).val(tot); 
 	};
-
+        */
+        
 	$(document).ready(function() {
-		$('#tordenes').DataTable({
-			"aaSorting": [[ 0, "desc" ]]
-			});	
-		$('#plus').hide();
-
-		var counter = 60;
-		var timer = function(){
-			$('div.counter').html("La p&aacute;gina se recargar&aacute; en " +counter + " segundos");
-			  if(counter == 0){
-				  //alert("termino counter");
-				  this.document.location.href = "/cafeteria/orden/cocina";
-			  }
-			  counter--;
-			  setTimeout(timer,1000);
-			};
-		timer();	
+            /*listar();
+            var counter = 20;
+            var timer = function(){
+                    //$('div.counter').html("La p&aacute;gina se recargar&aacute; en " +counter + " segundos");
+                      if(counter == 0){
+                              //alert("termino counter");
+                              //this.document.location.href = "/cafeteria/orden/cocina";
+                              listar();
+                      }
+                      counter--;
+                      setTimeout(timer,1000);
+                    };
+            timer();
+            */
+            listar();
+            var counter = 10;
+            var timer = function(){
+                if(counter < 1){
+                    tabla.ajax.reload( null, false );
+                    counter = 11;
+                }
+                      counter--;
+                      setTimeout(timer,1000);
+                    };
+            timer();
+            
+            /*setInterval( function () {
+                alert("ingreso");
+                tabla.ajax.reload( null, false ); // user paging is not reset on reload
+            }, 20000 );*/
 	} );
+        var tabla = "";
+        var listar = function (){
+            tabla = $('#tordenes').DataTable({
+                        //"processing": false,
+                        //"serverSide": true,
+			//"aaSorting": [[ 0, "desc" ], [1, "asc"]],
+                        "ajax": {
+                            "url": "orden/tablaCocina",
+                            "type": "POST"
+			},
+                        "columns": [
+                            { "data": "p" },
+                            { "data": "n" },
+                            { "data": "o" },
+                            { "data": "c" },
+                            { "data": "e" }
+                        ]
+		});
+            };
+         /*       
 
 	function hideForm() {
 		$("#hform").hide();
@@ -44,13 +79,34 @@
 	function showForm() {
 		$("#plus").hide();
 		$("#hform").show();
-	}
+	}*/
 </script>
 <link rel="stylesheet" type="text/css" href="css/cocina.css">
 <?php 
 echo $this->view->titulo;
 echo $this->getContent();
 echo $this->view->form; 
-echo $this->view->tabla;
+//echo $this->view->tabla;
 ?>
 <div id="counter" name="counter" class="counter"></div>
+
+<table id="tordenes" class="display" cellspacing="0" width="95%">
+    <thead>
+        <tr>
+            <th>P</th>
+            <th>N&uacute;mero</th>
+            <th>Orden</th>
+            <th>Cambios</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>P</th>
+            <th>N&uacute;mero</th>
+            <th>Orden</th>
+            <th>Cambios</th>
+            <th>Estado</th>
+        </tr>
+    </tfoot>
+</table>

@@ -2,7 +2,7 @@
 /*images with the same height*/
 .crop {
     /*height: 300px;*/
-    width: 25%;
+    width: 16.66%;
     overflow: hidden;
 }
 .crop img {
@@ -21,8 +21,8 @@
 }
 
 .tmenu td {
-	width: 25%;
-	height: 150px;
+	width: 16.67%;
+	height: 100px;
 	text-align: center;
 }
 
@@ -41,7 +41,14 @@ img {
 
 .counter {
 	position: absolute;
-	right: 25px;
-	top: 25px;
-	font-size: 1em;
+        left: 35%;
+	top: 15px;
+	font-size: 2em;
+}
+
+.b_pause {
+	position: absolute;
+	right: 65%;
+	top: 10px;
+	font-size: 3em;
 }

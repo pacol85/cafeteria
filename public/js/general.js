@@ -13,7 +13,17 @@ $(document).ready(
 								&& (event.which < 48 || event.which > 57))
 							event.preventDefault();
 
-					});			
+					});
+                                        
+                        $("#mhora").inputmask({
+			    mask: "99:99",
+			    definitions: {
+                                '0': {validator: "[0-1]"},
+                                '1': {validator: "[0-9]"},
+                                '3': {validator: "[0-5]"},
+                                '4': {validator: "[0-9]"}
+                            }
+			});
 		});
 
 function showResult(str) {

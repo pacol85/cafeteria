@@ -6,8 +6,8 @@ class OrdenController extends ControllerBase
 		parent::limpiar();
 		$campos = [
     			["t", ["numero"], "N&uacute;mero"],
-				["t", ["cliente"], "Cliente"],
-    			["t", ["ident"], "Descripci&oacute;n"],    			
+			["t", ["cliente"], "Cliente"],
+    			["t", ["mhora"], "Hora"],    			
     			["t", ["otros"], "Cambios"],
     			["s", ["crear"], "Crear"]
     	];
@@ -17,7 +17,7 @@ class OrdenController extends ControllerBase
 		//tabla
 		$head = ["P","N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
 		$tabla = parent::thead("orden", $head);
-		$ordenes = Orden::find(["hinicio > curdate() and estado < 5", "order" => "prioridad desc"]);
+		$ordenes = Orden::find(["hinicio > curdate() and estado < 4", "order" => "prioridad desc"]);
 		foreach ($ordenes as $o){
 			$items = Item::find("orden = $o->id");
 			$estado = Orderstatus::findFirst("id = $o->estado");
@@ -104,7 +104,7 @@ class OrdenController extends ControllerBase
     				parent::msg("Orden creada exitosamente", "s");
     			}    			
     		}else{
-    			parent::msg("Ocurri&oacute; un error durante la operación");
+    			parent::msg("Ocurri&oacute; un error durante la operaciï¿½n");
     		}
     	}else{
     		parent::msg("El n&uacute;mero de orden no puede quedar en blanco");
@@ -224,7 +224,7 @@ class OrdenController extends ControllerBase
     		if($menu->update()){
     			parent::msg("Men&uacute; actualizado exitosamente", "s");
     		}else{
-    			parent::msg("Ocurri&oacute; un error durante la operación");
+    			parent::msg("Ocurri&oacute; un error durante la operaciï¿½n");
     		}
     	}else{
     		parent::msg("El campo c&oacute; no puede quedar en blanco");
@@ -258,6 +258,7 @@ class OrdenController extends ControllerBase
     		$estado->estado,
     		parent::a(1, "orden/estadoCocina/$o->id", "Siguiente Paso")
     		];
+                $cl2 = "";
     		switch ($pos) {
     			case 1:
     				$tabla = $tabla.parent::tbodyClass($col, "uno");
@@ -273,7 +274,7 @@ class OrdenController extends ControllerBase
     		
     	}
     
-    	parent::view("Cocina", $form, $tabla);
+    	parent::view("Cocina", $form); //, $tabla);
     }
     
     function estadoCocinaAction($oid){
@@ -285,5 +286,24 @@ class OrdenController extends ControllerBase
     		}
     		return parent::forward("orden", "cocina");
     	}
+    }
+    
+    /**
+     * FunciÃ³n para cargar la tabla de la Cocina con JSON
+     */
+    function tablaCocinaAction() {
+        $ordenes = Orden::find("hinicio > curdate() and estado < 3 order by prioridad desc");
+        foreach ($ordenes as $o) {
+            $items = Item::find("orden = $o->id");
+    		$ordenado = "";
+    		$e = Orderstatus::findFirst("id = $o->estado");
+    		foreach ($items as $i){
+    			$m = Menu::findFirst("id = $i->menu");
+    			$ordenado = $ordenado."$m->nombre: $i->cantidad, ";
+    		}
+    		$ordenado = substr($ordenado, 0, strlen($ordenado)-2); 
+            $response["data"][] = ["p" => $o->prioridad, "n" => $o->numero, "o" => $ordenado, "c" => $o->otros , "e" => $e->estado];            
+        }
+        return parent::sendJson($response);
     }
 }
