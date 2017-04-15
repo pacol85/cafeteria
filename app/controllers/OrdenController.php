@@ -237,7 +237,7 @@ class OrdenController extends ControllerBase
     	$form = parent::formCocina("orden/cocinados", "form1");
     
     	//tabla
-    	$head = ["P", "N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
+    	/*$head = ["P", "N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
     	$tabla = parent::thead("tordenes", $head);
     	$ordenes = Orden::find("hinicio > curdate() and estado < 3 order by prioridad desc");
     	$pos = 1;
@@ -272,7 +272,7 @@ class OrdenController extends ControllerBase
     		}
     		$pos = $pos + 1;
     		
-    	}
+    	}*/
     
     	parent::view("Cocina", $form); //, $tabla);
     }
@@ -305,5 +305,42 @@ class OrdenController extends ControllerBase
             $response["data"][] = ["p" => $o->prioridad, "n" => $o->numero, "o" => $ordenado, "c" => $o->otros , "e" => $e->estado];            
         }
         return parent::sendJson($response);
+    }
+    
+    /**
+     * Función para actualizar totales de ordenes
+     */
+    function totalesCocinaAction(){
+        
+        $nt = 0;
+        $cid = parent::gPost("cid");
+        $biggest = 0;
+        $o = Orden::find("hinicio > curdate() and estado < 3");
+        $form2 = [];
+        $lid = "";
+        if($cid == ""){
+            
+            $nt = count($o);
+            
+            if($nt > 0){
+                foreach ($o as $o2) {
+                    if($o2->id > $biggest) $biggest = $o2->id;
+                }
+                $lid = $biggest;
+            }else{
+                $lid = "";
+            }
+        }else{
+            $biggest = $cid;
+            foreach ($o as $o2) {
+                if($o2->id > $biggest){
+                    $biggest = $o2->id;
+                    $nt = $nt + 1;
+                }
+            }
+            $lid = $biggest;
+        }
+        $form = ["tots" => parent::formCocina("orden/cocinados", "form1"), "nt" => "$nt", "lid" => $lid];
+        return parent::sendJson($form);
     }
 }

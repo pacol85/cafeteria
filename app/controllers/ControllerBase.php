@@ -918,7 +918,7 @@ class ControllerBase extends Controller {
 			switch ($c){
 				case 1:
 					$hm = $hm."<tr>";
-					$elem = $elem."<td><b>$m->nombre</b></td>";
+					//$elem = $elem."<td><b>$m->nombre</b></td>";
 					$orden = Orden::find("hinicio > curdate() and estado < 3 order by prioridad desc");
 					$total = 0;
 					foreach ($orden as $o){
@@ -927,11 +927,15 @@ class ControllerBase extends Controller {
 							$total = $total + number_format($i->cantidad, 0);
 						}
 					}
-					$elem = $elem."<td><b>$total</b></td>";
+                                        if($total > 0){
+                                            $elem = $elem."<td><div class='mayor'><b>$m->nombre</b></div></td>"."<td><div class='mayor'><b>$total</b></div></td>";
+                                        }else{
+                                            $elem = $elem."<td><b>$m->nombre</b></td>"."<td><b>$total</b></td>";
+                                        }					
 					$c = $c+1;
 					break;
 				case 2:
-					$elem = $elem."<td><b>$m->nombre</b></td>";
+					//$elem = $elem."<td><b>$m->nombre</b></td>";
 					$orden = Orden::find("hinicio > curdate() and estado < 3 order by prioridad desc");
 					$total = 0;
 					foreach ($orden as $o){
@@ -940,7 +944,11 @@ class ControllerBase extends Controller {
 							$total = $total + number_format($i->cantidad, 0);
 						}						
 					}
-					$elem = $elem."<td><b>$total</b></td></tr>";
+					if($total > 0){
+                                            $elem = $elem."<td><div class='mayor'><b>$m->nombre</b></div></td>"."<td><div class='mayor'><b>$total</b></div></td>";
+                                        }else{
+                                            $elem = $elem."<td><b>$m->nombre</b></td>"."<td><b>$total</b></td>";
+                                        }
 					$c = 1;
 					$hm = $hm.$elem;
 					$elem = "";

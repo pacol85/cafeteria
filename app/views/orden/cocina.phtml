@@ -1,43 +1,22 @@
 <script type="text/javascript">
-	/*function addHidden(id){
-		var tot = parseInt($("#n"+id).val());
-		tot = tot + 1;
-		$("#n"+id).val(tot);
-		$("#d"+id).val(tot); 
-	};
-
-	function remHidden(id){
-		var tot = parseInt($("#n"+id).val());
-		if(tot <= 0){
-			tot = 0;
-		}else{
-			tot = tot - 1;
-		}
-		$("#n"+id).val(tot);
-		$("#d"+id).val(tot); 
-	};
-        */
-        
+    ion.sound({
+                sounds: [
+                    {
+                        name: "bikeHorn"
+                    }
+                ],
+                volume: 1.0,
+                path: "sounds/",
+                preload: true
+            });
+            
 	$(document).ready(function() {
-            /*listar();
-            var counter = 20;
-            var timer = function(){
-                    //$('div.counter').html("La p&aacute;gina se recargar&aacute; en " +counter + " segundos");
-                      if(counter == 0){
-                              //alert("termino counter");
-                              //this.document.location.href = "/cafeteria/orden/cocina";
-                              listar();
-                      }
-                      counter--;
-                      setTimeout(timer,1000);
-                    };
-            timer();
-            */
             listar();
             var counter = 10;
             var timer = function(){
                 if(counter < 1){
                     tabla.ajax.reload( null, false );
+                    totales();
                     counter = 11;
                 }
                       counter--;
@@ -45,10 +24,43 @@
                     };
             timer();
             
-            /*setInterval( function () {
-                alert("ingreso");
-                tabla.ajax.reload( null, false ); // user paging is not reset on reload
-            }, 20000 );*/
+            var totales = function(){
+                $.ajax({
+			type: "POST",
+			url: "orden/totalesCocina", 
+                        data: {cid: $('#lid').val()}, 
+			dataType: "json",
+			success: function(result){
+				var jsondata = jQuery.parseJSON(JSON.stringify(result)); 
+				$("#totalesDiv").html(jsondata.tots);
+                                $("#lid").val(jsondata.lid);
+                                if(jsondata.nt > 0){
+                                   for (i = 0; i < jsondata.nt; i++) {
+                                       ion.sound.play("bikeHorn");
+                                   }
+                                }
+			}});
+            };
+            
+            
+            /*
+            $('#dept').change(function() {
+		var dis = 0;
+		var $radios = $('input:radio[value=Departamento]');
+		if($radios.is(':checked') === true) {
+			dis = 1;
+		}
+		$.ajax({
+			type: "POST",
+			url: "formulario/listUsers", 
+			data: {dept: $('#dept').val(), disable: dis},
+			dataType: "json",
+			success: function(result){
+				var jsondata = jQuery.parseJSON(JSON.stringify(result)); 
+				$("#udiv").html(jsondata.select);
+			}});
+            });*/
+            
 	} );
         var tabla = "";
         var listar = function (){
@@ -68,28 +80,21 @@
                             { "data": "e" }
                         ]
 		});
-            };
-         /*       
-
-	function hideForm() {
-		$("#hform").hide();
-		$("#plus").show();
-	}
-
-	function showForm() {
-		$("#plus").hide();
-		$("#hform").show();
-	}*/
+            };         
 </script>
 <link rel="stylesheet" type="text/css" href="css/cocina.css">
 <?php 
 echo $this->view->titulo;
-echo $this->getContent();
+echo $this->getContent(); 
+echo $this->tag->hiddenField ( array ("lid", "value" => "") );
+?>
+<div id="totalesDiv">
+<?php
 echo $this->view->form; 
 //echo $this->view->tabla;
 ?>
+</div>
 <div id="counter" name="counter" class="counter"></div>
-
 <table id="tordenes" class="display" cellspacing="0" width="95%">
     <thead>
         <tr>
