@@ -15,7 +15,7 @@ class OrdenController extends ControllerBase
 		$form = parent::formCafe($campos, 3 , "orden/crear", "form1");
 		
 		//tabla
-		$head = ["P","N&uacute;mero", "Orden", "Hora", "Cambios", "Estado", "Acciones"];
+		/*$head = ["P","N&uacute;mero", "Orden", "Hora", "Cambios", "Estado", "Acciones"];
 		$tabla = parent::thead("orden", $head);
 		$ordenes = Orden::find(["hinicio > curdate() and estado < 4", "order" => "prioridad desc"]);
 		foreach ($ordenes as $o){
@@ -59,9 +59,9 @@ class OrdenController extends ControllerBase
 				$tabla = $tabla.parent::tbody($col);;
 			}
 			
-		}
+		}*/
 		
-    	parent::view("Orden", $form, $tabla);
+    	parent::view("Orden", $form); //, $tabla);
     }
     
     public function crearAction(){
@@ -251,7 +251,8 @@ class OrdenController extends ControllerBase
     public function cocinaAction()
     {
     	$form = parent::formCocina("orden/cocinados", "form1");
-    
+        //$tabla = ["tordenes", ["P", "N&uacute;mero", "Orden", "Hora", "Cambios", "Estado"]];
+        
     	//tabla
     	/*$head = ["P", "N&uacute;mero", "Orden", "Cambios", "Estado", "Acciones"];
     	$tabla = parent::thead("tordenes", $head);
@@ -290,7 +291,7 @@ class OrdenController extends ControllerBase
     		
     	}*/
     
-    	parent::view("Cocina", $form); //, $tabla);
+    	parent::view("Cocina", $form);
     }
     
     function estadoCocinaAction($oid){
@@ -387,5 +388,45 @@ class OrdenController extends ControllerBase
     	$prioridadMax = Orden::maximum(["column" => "prioridad", "conditions" => "hinicio > curdate() and estado < 5"]);
     	$orden->prioridad = $prioridadMax + 1;
         $orden->update();
+    }
+    
+    /**
+     * Función para cargar la tabla de las Ordenes con JSON
+     */
+    function tablaOrdenAction() {
+        $ordenes = Orden::find(["hinicio > curdate() and estado < 4", "order" => "prioridad desc"]);
+        foreach ($ordenes as $o){
+            $items = Item::find("orden = $o->id");
+            $estado = Orderstatus::findFirst("id = $o->estado");
+            $ordenado = "";
+            foreach ($items as $i){
+                    $m = Menu::findFirst("id = $i->menu");
+                    $ordenado = $ordenado."$m->nombre: $i->cantidad, ";
+            }
+            $ordenado = substr($ordenado, 0, strlen($ordenado)-2);
+
+            $accion = "";
+            switch ($o->estado){
+                    case 3:
+                            $accion = parent::a(1, "orden/estadoOrden/$o->id", "Siguiente Paso") ." | ".
+                                            parent::a(1, "orden/cancelarOrden/$o->id", "Cancelar");
+                    break;
+                    case 4:
+                            $accion = parent::a(1, "orden/prioridad/$o->id", "Prioridad");
+                    break;
+                    default:
+                            $accion = parent::a(1, "orden/cancelarOrden/$o->id", "Cancelar") ." | ".
+                            $accion = parent::a(1, "orden/prioridad/$o->id", "Prioridad") ." | ".
+                            $accion = parent::a(1, "orden/entregado/$o->id", "Entregado");
+                    break;
+            }
+
+            $stime = "";
+            if($o->identificacion != "00:00:00"){
+                $stime = date('H:i', strtotime($o->identificacion));
+            }
+            $response["data"][] = ["p" => $o->prioridad, "n" => $o->numero, "o" => $ordenado, "h" =>$stime, "c" => $o->otros , "e" => $estado->estado, "a" => $accion];            
+        }
+        return parent::sendJson($response);
     }
 }

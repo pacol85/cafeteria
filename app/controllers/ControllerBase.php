@@ -999,4 +999,39 @@ class ControllerBase extends Controller {
 		$tr = $tr . "</tr>";
 		return $tr;
 	}
+        
+        /*
+         * Función para dibujar tabla para AJAX
+         */
+        public function ajaxTable($id, $columnas){
+            $table = "<table id=\"$id\" class=\"display\" cellspacing=\"0\" width=\"95%\">\n<thead>\n<tr>\n";
+            foreach ($columnas as $c) {
+                $table = $table . "<th>$c</th>\n";
+            }
+            $table = $table . "</tr>\n</thead>\n<tfoot>\n<tr>\n";
+            foreach ($columnas as $c) {
+                $table = $table . "<th>$c</th>\n";
+            }
+            $table = $table . "</tr>\n</tfoot>\n</table>";
+            return $table;
+        }
+        
+        /*
+	 * ajaxView function, sets the usual suspects that go into a view
+	 */
+	public function ajaxView($titulo, $form = "", $tabla = [], $botones = []){
+		$this->view->titulo = $this->elemento("h1", ["titulo"], $titulo);
+		$this->view->form = $form;
+                if(count($tabla) > 0){
+                    $this->view->tabla = $this->ajaxTable($tabla[0], $tabla[1]);
+                }
+		
+		$boton = "";
+		if(count($botones) > 0){
+			$boton = $this->elemento("bg", [["edit", "guardarCambio()", "Editar"],["cancel", "cancelar()", "Cancelar"]], "");
+			$js = $this->jsCargarDatos($botones[0], ["main"], ["edit"], $botones[1]);
+			$this->view->js = $js.$this->jsBotones($botones[2][0], $botones[2][1], $botones[2][2]);
+		}
+		$this->view->botones = $boton;
+	}
 }

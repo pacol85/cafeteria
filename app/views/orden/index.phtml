@@ -20,10 +20,21 @@
 	};
 
 	$(document).ready(function() {
-		$('#orden').DataTable({
+		/*$('#torden').DataTable({
 			"aaSorting": [[ 0, "desc" ]]
-			});	
-		$('#plus').hide();
+			});*/
+            listar();
+            var counter = 10;
+            var timer = function(){
+                if(counter < 1){
+                    tabla.ajax.reload( null, false );
+                    counter = 11;
+                }
+                      counter--;
+                      setTimeout(timer,1000);
+                    };
+            timer();
+            $('#plus').hide();
 
 		/*var counter = 60;
 		var timer = function(){
@@ -59,6 +70,26 @@
 		$("#plus").hide();
 		$("#hform").show();
 	}
+        
+        var tabla = "";
+        var listar = function (){
+            tabla = $('#torden').DataTable({
+                        "aaSorting": [[ 0, "desc" ]],// [1, "asc"]],
+                        "ajax": {
+                            "url": "orden/tablaOrden",
+                            "type": "POST"
+			},
+                        "columns": [
+                            { "data": "p" },
+                            { "data": "n" },
+                            { "data": "o" },
+                            { "data": "h" },
+                            { "data": "c" },
+                            { "data": "e" },
+                            { "data": "a" }
+                        ] 
+		});
+            };
 </script>
 <link rel="stylesheet" type="text/css" href="css/orden.css">
 <?php 
@@ -68,16 +99,41 @@ echo $this->getContent();
 <div id="hform" class="hform">
 <?php 
 echo $this->view->form;
+//echo $this->view->tabla;
+/*
+<div id="counter" name="counter" class="counter"></div>
+<div id="b_pause" name="b_pause" class="b_pause"><span class="glyphicon glyphicon-pause" onclick="pauseCounter();"></span></div>
+ */
+
 ?>
 <a onClick ="hideForm();" class="btn btn-info btn-lg"><span class="glyphicon glyphicon-chevron-up" ></span></a>
 </div>
 <div id="plus">
 <a onClick ="showForm();" class="btn btn-info btn-lg"><span class="glyphicon glyphicon-chevron-down"></span></a>
 </div>
-<?php 
-echo $this->view->tabla;
-/*
-<div id="counter" name="counter" class="counter"></div>
-<div id="b_pause" name="b_pause" class="b_pause"><span class="glyphicon glyphicon-pause" onclick="pauseCounter();"></span></div>
- */
-?>
+<div id="tdiv" class='col-sm-12'>
+<table id="torden" class="display" cellspacing="0" width="95%">
+    <thead>
+        <tr>
+            <th>P</th>
+            <th>N&uacute;mero</th>
+            <th>Orden</th>
+            <th>Hora</th>
+            <th>Cambios</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>P</th>
+            <th>N&uacute;mero</th>
+            <th>Orden</th>
+            <th>Hora</th>
+            <th>Cambios</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </tfoot>
+</table>
+</div>
