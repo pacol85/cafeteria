@@ -38,7 +38,7 @@
                                    for (i = 0; i < jsondata.nt; i++) {
                                        ion.sound.play("bikeHorn");
                                    }
-                                }
+                                }                                
 			}});
             };
             
@@ -67,7 +67,7 @@
             tabla = $('#tordenes').DataTable({
                         //"processing": false,
                         //"serverSide": true,
-			//"aaSorting": [[ 0, "desc" ], [1, "asc"]],
+			"aaSorting": [[ 0, "desc" ], [1, "asc"]],
                         "ajax": {
                             "url": "orden/tablaCocina",
                             "type": "POST"
@@ -76,6 +76,7 @@
                             { "data": "p" },
                             { "data": "n" },
                             { "data": "o" },
+                            { "data": "h"},
                             { "data": "c" },
                             { "data": "e" }
                         ]
@@ -101,6 +102,7 @@ echo $this->view->form;
             <th>P</th>
             <th>N&uacute;mero</th>
             <th>Orden</th>
+            <th>Hora</th>
             <th>Cambios</th>
             <th>Estado</th>
         </tr>
@@ -110,6 +112,7 @@ echo $this->view->form;
             <th>P</th>
             <th>N&uacute;mero</th>
             <th>Orden</th>
+            <th>Hora</th>
             <th>Cambios</th>
             <th>Estado</th>
         </tr>

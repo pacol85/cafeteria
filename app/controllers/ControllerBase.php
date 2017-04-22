@@ -32,6 +32,29 @@ class ControllerBase extends Controller {
 			return gmdate ( "Y-m-d", time () + 3600 * ($timezone) );
 		}
 	}
+        
+        /**
+         * Fecha para ingrear a mysql
+         */
+        public function fechaMySQL($hora, $today = true, $fecha = "") {
+            if($today){
+                $hoy = $this->fechaHoy(false);
+                $mysqltime = date ("Y-m-d H:i:s", "$hoy $hora");
+                return $mysqltime;
+            }
+        }
+        
+        /**
+         * Comparar tiempo
+         */
+        public function comparaTiempo($tiempo) {
+            date_default_timezone_set('America/El_Salvador');
+            if ((time() + (30 * 60)) >= strtotime($tiempo)) {
+              return true;
+            }else{
+                return false;
+            }
+        }
 	
 	// Sends the json response
 	public function sendJson($data) {
