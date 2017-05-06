@@ -9,6 +9,7 @@ class OrdenController extends ControllerBase
 			["t", ["cliente"], "Cliente"],
     			["t", ["mhora"], "Hora"],    			
     			["t", ["otros"], "Cambios"],
+                        ["h", ["id"], ""],
     			["s", ["crear"], "Crear"]
     	];
     	
@@ -60,8 +61,13 @@ class OrdenController extends ControllerBase
 			}
 			
 		}*/
+                
+        //js
+        $fields = ["id", "numero", "cliente", "mhora", "otros"];
+        $otros = "";
+        $jsBotones = ["form1", "orden/edit", "orden"];
 		
-    	parent::view("Orden", $form); //, $tabla);
+    	parent::view("Orden", $form, "", [$fields, $otros, $jsBotones]); //, $tabla);
     }
     
     public function crearAction(){
@@ -203,49 +209,59 @@ class OrdenController extends ControllerBase
     }
     
     public function editAction(){
-    	if(parent::vPost("codigo")){
-    		$cod = parent::gPost("codigo");
-    		$id = parent::gPost("id");
-    		$exist = Menu::find("codigo = '$cod' and not(id = $id)");
+    	if(parent::vPost("numero")){
+    		$num = parent::gPost("numero");
+                $id = parent::gPost("id");
+    		$exist = Orden::find("numero = '$num' and hinicio > curdate() and id not like $id");
     		if(count($exist) > 0){
-    			parent::msg("El c&oacute;digo ingresado ya existe");
-    			return parent::forward("menu", "index");
+    			parent::msg("Este n&uacute;mero de orden ya fue ingresado");
+    			return parent::forward("orden", "index");
     		}
-    		$nombre = parent::gPost("nombre");
     		
-    		$menu = Menu::findFirst("id = $id");
-    		$menu->codigo = $cod;
-    		$menu->descripcion = parent::gPost("desc");
-    		$menu->disponible = 1;
-    		$menu->nombre = $nombre;
-    		$menu->precio = parent::gPost("precio");
-    		$menu->seccion = parent::gPost("seccion");
-    		
-    		//Phalcon upload file
-    		if (true == $this->request->hasFiles() && $this->request->isPost()) {
-    			$upload_dir = APP_PATH . '\\public\\img\\';
-    		
-    			foreach ($this->request->getUploadedFiles() as $file) {
-    				if(strlen($file->getName()) > 0){
-    					$punto = strpos($file->getName(), ".");
-    					$menu->foto = $menu->codigo.substr($file->getName(), $punto);
-    					$file->moveTo($upload_dir . $menu->foto);
-    					
-    				}
-    				
+    		$orden = Orden::findFirst("id = $id");
+    		$orden->cliente = parent::gPost("cliente");
+    		$orden->estado = 1;
+    		$orden->hinicio = parent::fechaHoy(true);
+    		$orden->identificacion = parent::gPost("mhora");
+    		$orden->numero = $num;
+    		$orden->otros = parent::gPost("otros");
+    		$orden->prioridad = 0;
+    		    		
+    		if($orden->update()){
+                    //borrar otros items anteriores
+                    $oldItems = Item::find("orden = $orden->id");
+                    foreach ($oldItems as $oi){
+                        $oi->delete();
+                    }
+    			$items = 0;
+    			//guardar items de la orden
+    			$menu = Menu::find();
+    			foreach ($menu as $m){
+                            $cant = parent::gPost("n$m->id");
+                            if($cant != null && $cant > 0){
+                                $items++;
+                                $i = new Item();
+                                $i->cantidad = $cant;
+                                $i->menu = $m->id;
+                                $i->orden = $orden->id;
+                                if(!$i->save()){
+                                    parent::msg("", "db");
+                                }
+                            }    				 
     			}
-    		
-    		}
-    		
-    		if($menu->update()){
-    			parent::msg("Men&uacute; actualizado exitosamente", "s");
+    			if($items < 1){
+    				$orden->delete();
+    				parent::msg("La orden no conten&iacute;a ning&uacute;n &iacute;tem");	
+    			}else{
+    				parent::msg("Orden modificada exitosamente", "s");
+    			}    			
     		}else{
     			parent::msg("Ocurri&oacute; un error durante la operaci�n");
     		}
     	}else{
-    		parent::msg("El campo c&oacute; no puede quedar en blanco");
+    		parent::msg("El n&uacute;mero de orden no puede quedar en blanco");
     	}
-    	parent::forward("menu", "index");
+    	parent::forward("orden", "index");
     }
     
     public function cocinaAction()
@@ -399,12 +415,13 @@ class OrdenController extends ControllerBase
             $items = Item::find("orden = $o->id");
             $estado = Orderstatus::findFirst("id = $o->estado");
             $ordenado = "";
+            $ids = "";
             foreach ($items as $i){
                     $m = Menu::findFirst("id = $i->menu");
                     $ordenado = $ordenado."$m->nombre: $i->cantidad, ";
+                    $ids = $ids."$m->id,$i->cantidad;";
             }
             $ordenado = substr($ordenado, 0, strlen($ordenado)-2);
-
             $accion = "";
             switch ($o->estado){
                     case 3:
@@ -417,6 +434,8 @@ class OrdenController extends ControllerBase
                     default:
                             $accion = parent::a(1, "orden/cancelarOrden/$o->id", "Cancelar") ." | ".
                             $accion = parent::a(1, "orden/prioridad/$o->id", "Prioridad") ." | ".
+                            $accion = parent::a(2, "cargarDatos('".$o->id."', '".$o->numero."', '".$o->cliente."', '".$o->identificacion
+                                    ."', '".$o->otros."');fillMenu('".$ids."');","Editar") ." | ".
                             $accion = parent::a(1, "orden/entregado/$o->id", "Entregado");
                     break;
             }

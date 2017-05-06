@@ -35,6 +35,7 @@
                     };
             timer();
             $('#plus').hide();
+            $('.edit').hide();
 
 		/*var counter = 60;
 		var timer = function(){
@@ -71,6 +72,16 @@
 		$("#hform").show();
 	}
         
+        function fillMenu(ids) {
+            var spl = ids.split(";");
+            $.each(spl, function(index, value){
+               var items = value.split(",");
+               $("#nx" + items[0]).val(items[1]);
+               $("#d" + items[0]).val(items[1]);
+            });
+               
+        }
+        
         var tabla = "";
         var listar = function (){
             tabla = $('#torden').DataTable({
@@ -90,6 +101,8 @@
                         ] 
 		});
             };
+            
+            <?php echo $this->view->js;?>
 </script>
 <link rel="stylesheet" type="text/css" href="css/orden.css">
 <?php 
@@ -99,6 +112,7 @@ echo $this->getContent();
 <div id="hform" class="hform">
 <?php 
 echo $this->view->form;
+echo $this->view->botones;
 //echo $this->view->tabla;
 /*
 <div id="counter" name="counter" class="counter"></div>
