@@ -1,6 +1,6 @@
 <script type="text/javascript" language="javascript" class="init">
 	$(document).ready(function() {
-		
+            requestData(30, chart, "ordenSemana");
 	} );
 
 	<?php echo $this->view->js;?>
@@ -8,6 +8,9 @@
 <style >
     .cdonuts{
   height:400px;
+}
+div{
+    align: center;
 }
 </style>
 <?php 
@@ -17,37 +20,29 @@ echo $this->view->form;
 echo $this->view->botones;
 echo $this->view->tabla;
 ?>
-<h3>&Oacute;rdenes de los &uacute;ltimos 7 d&iacute;as</h3>
+<div class="btn-group" role="group" aria-label="...">
+    <button type="button" class="btn btn-default" onclick="muestraDona(1);">Hoy</button>
+  <button type="button" class="btn btn-default" onclick="muestraDona(7);">7 D&iacute;as</button>
+  <button type="button" class="btn btn-default" onclick="muestraDona(15);">15 D&iacute;as</button>
+  <button type="button" class="btn btn-default" onclick="muestraDona(30);">30 D&iacute;as</button>
+</div>
+<div id="tDonut"><h3>&Oacute;rdenes de los &uacute;ltimos 30 d&iacute;as</h3></div>
 <div id="ordenSemana" class="cdonuts"></div>
 <script type="text/javascript" language="javascript">
 
+function muestraDona(dias){
+    $("#tDonut").html("<h3>&Oacute;rdenes de los &uacute;ltimos " + dias + " d&iacute;as</h3>");
+    requestData(dias, chart, "ordenSemana");
+}
+
 var chart = new Morris.Donut({
-  // ID of the element in which to draw the chart.
   element: 'ordenSemana',
-  // Chart data records -- each entry in this array corresponds to a point on
-  // the chart.
   data: [
     { label: 'Hamburguesas', value: 0 },
     { label: 'Papas_fritas', value: 0 }
   ],
-  // The name of the data record attribute that contains x-values.
-  //xkey: 'semana',
-  // A list of names of data record attributes that contain y-values.
-  //ykeys: ['h', 'p'],
-  // Labels for the ykeys -- will be displayed when you hover over the
-  // chart.
-  //labels: ['h', 'p']
 }, 2000);    
-/*var data = [
-    { semana: '2010', a: 5, b: 10 },
-    { year: '2011', a: 5, b: 15 },
-    { year: '2012', a: 20, b: 5 }
-];
-chart.setData(data);
-*/
-// Create a function that will handle AJAX requests
   function requestData(days, chart, cname){
-      //chart.empty();
     $.ajax({
       type: "POST",
       dataType: 'json',
@@ -56,8 +51,7 @@ chart.setData(data);
     })
     .done(function( data ) {
       // When the response to the AJAX request comes back render the chart with new data
-      chart.setData(data);
-      //chart.setLabels([]);
+      chart.setData(data);      
     })
     .fail(function() {
       // If there is no communication between the server, show an error
@@ -65,6 +59,6 @@ chart.setData(data);
     });
   }
   
-  requestData(7, chart, "ordenSemana");
+  
 </script>
     

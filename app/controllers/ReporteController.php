@@ -391,8 +391,6 @@ class ReporteController extends ControllerBase
      */
     function chartDataAction(){
         $days = parent::gPost("days");
-        //$cname = parent::gPost("cname");
-        //$ordenes = Orden::find("hinicio > curdate()- justifyinterval('7 day') and (estado = 1 or estado = 4)"); // - interval $days day 
         $query = "select * from orden where hinicio > curdate() - interval $days day and (estado = 1 or estado = 4)";
         $ordenes = parent::query(new Orden(), $query);
         $response = array();
@@ -408,7 +406,7 @@ class ReporteController extends ControllerBase
             }
         }
         
-        //krsort($totales);
+        arsort($totales);
         
         foreach ($totales as $k => $t){
             //$prueba = $prueba."$t, $k; ";
