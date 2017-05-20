@@ -1,5 +1,7 @@
 <?php
 use Phalcon\Mvc\Controller;
+use Phalcon\Mvc\Model\Resultset\Simple as Resultset;
+
 class ControllerBase extends Controller {
 	/**
 	 * Main init function
