@@ -3,8 +3,9 @@ class ReporteController extends ControllerBase
 {
     public function indexAction()
     {
-        parent::limpiar();
+        parent::limpiar();       
         parent::view("Reportes", ""); //, $tabla);
+        $this->view->form = parent::elemento("h", ["hdias"], 1);
     }
     
     public function crearAction(){
@@ -401,7 +402,7 @@ class ReporteController extends ControllerBase
                 if($totales["$i->menu"] != null){
                     $totales["$i->menu"] = $totales["$i->menu"] + $i->cantidad;
                 }else{
-                    $totales["$i->menu"] = $i->cantidad;
+                    $totales["$i->menu"] = $i->cantidad + 0;
                 }                
             }
         }
@@ -420,5 +421,159 @@ class ReporteController extends ControllerBase
       
 );*/
         return parent::sendJson($response);
+    }
+    
+    /**
+     * chartData
+     */
+    function chartDataAPIAction($days){
+        //$days = parent::gPost("days");
+        $query = "select * from orden where hinicio > curdate() - interval $days day and (estado = 1 or estado = 4)";
+        $ordenes = parent::query(new Orden(), $query);
+        $response = array();
+        $totales["0"] = 0;
+        foreach ($ordenes as $o){
+            $items = Item::find("orden = $o->id");
+            foreach ($items as $i) {
+                if($totales["$i->menu"] != null){
+                    $totales["$i->menu"] = $totales["$i->menu"] + $i->cantidad;
+                }else{
+                    $totales["$i->menu"] = $i->cantidad +0;
+                }                
+            }
+        }
+        
+        arsort($totales);
+        
+        foreach ($totales as $k => $t){
+            //$prueba = $prueba."$t, $k; ";
+            $menu = Menu::findFirst("id = $k");
+            if($k != 0) array_push($response, array('value' => $t, 'label' => "$menu->nombre"));
+        }
+        /*
+        $response = array(
+      array('label' => 'Hamburguesas','value' => 4),
+      array('label' => 'Papas_fritas','value' => 8)
+      
+);*/
+        return parent::sendJson($response);
+    }
+    
+    
+    /**
+     * chartDataAPIAction
+     * $days --> integer para días atras para la solicitud
+     */
+    function chartDataAPIV2Action($days){
+        //$days = parent::gPost("days");
+        $query = "select * from orden where hinicio > curdate() - interval $days day and (estado = 1 or estado = 4)";
+        $ordenes = parent::query(new Orden(), $query);
+        $response = array();
+        $totales["0"] = 0;
+
+        foreach ($ordenes as $o){
+            $items = Item::find("orden = $o->id");
+            foreach ($items as $i) {
+                if($totales["$i->menu"] != null){
+                    $totales["$i->menu"] = $totales["$i->menu"] + $i->cantidad;
+                }else{
+                    $totales["$i->menu"] = $i->cantidad +0;
+                }
+            }
+        }
+
+        arsort($totales);
+        $suma = $this->getSuma($totales);
+
+        $increments = count($totales);
+
+        $hs = $this->hexSplit($increments);
+        $iter = 0;
+        $lastItem = [];
+        
+        foreach ($totales as $k => $t){
+            //$prueba = $prueba."$t, $k; ";
+            $menu = Menu::findFirst("id = $k");
+            $porc = ($t / $suma) * 100; 
+            
+            $itemData = $this->angles($porc, $lastItem, $iter);
+            if($k != 0) array_push($response, array('value' => $t, 'label' => "$menu->nombre", 
+                'porc' => "$porc", 'color' => "#$hs[$iter]", 'idata' => $itemData));
+            
+            $iter = $iter + 1;
+            
+            //save lastItem
+            $lastItem = $itemData;
+        }
+        
+        array_push($response, $hs);
+        return parent::sendJson($response);
+    }
+    
+    /**
+     * hexSplit
+     */
+    public function hexSplit($increments, $start = "111111", $end = "eeeeee"){
+        $s = hexdec($start);
+        $e = hexdec($end);
+        $n = abs($e - $s);
+        $d = $increments;
+        
+        $tope = $e;
+        
+        if($n < $d){
+            $d = $n;
+        }
+        
+        $dif = round($n/$d);
+        $a = [];
+        for($i = 0; $i < $d; $i++){
+            $tope = $tope - $dif;
+            $hex = dechex($tope);
+            array_push($a, $hex);
+        }
+        
+        return $a;
+    }
+    
+    /**
+     * 
+     * @param type $totales
+     * @return type
+     */
+    public function getSuma($totales){
+        $suma = 0;
+        foreach ($totales as $t){
+            $suma = $suma + $t;
+        }
+        return $suma;
+    }
+    
+    /**
+     * 
+     * @param type $porc
+     */
+    public function angles($porc, $lastItem, $pos = 0){
+        
+        $wheelRotate = 0;
+        
+        $angle = ($porc / 100) * 360;
+        
+        if($pos == 0){
+            $wheelRotate = $angle / 2 + 90;
+        }else{
+            $wheelRotate = ($angle / 2) + ($lastItem->angle / 2);
+        }
+        
+        $startAngle = $lastItem["startAngle"] - $angle;
+        $endAngle = $lastItem["startAngle"];       
+        
+        if($endAngle == null){
+            $endAngle = 0;
+        }
+        
+        $item = ["startAngle" => $startAngle, "endAngle" => $endAngle, "rotation" => $wheelRotate];
+        
+        return $item;
     }
 }

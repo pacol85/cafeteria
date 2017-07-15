@@ -1,6 +1,17 @@
 <script type="text/javascript" language="javascript" class="init">
 	$(document).ready(function() {
-            requestData(30, chart, "ordenSemana");
+            requestData(1, chart, "ordenSemana");
+            var counter = 10;
+            var timer = function(){
+                if(counter < 1){
+                    var d = $("#hdias").val();
+                    requestData(d, chart, "ordenSemana");
+                    counter = 11;
+                }
+                      counter--;
+                      setTimeout(timer,1000);
+                    };
+            timer();
 	} );
 
 	<?php echo $this->view->js;?>
@@ -26,12 +37,13 @@ echo $this->view->tabla;
   <button type="button" class="btn btn-default" onclick="muestraDona(15);">15 D&iacute;as</button>
   <button type="button" class="btn btn-default" onclick="muestraDona(30);">30 D&iacute;as</button>
 </div>
-<div id="tDonut"><h3>&Oacute;rdenes de los &uacute;ltimos 30 d&iacute;as</h3></div>
+<div id="tDonut"><h3>&Oacute;rdenes de los &uacute;ltimos 1 d&iacute;as</h3></div>
 <div id="ordenSemana" class="cdonuts"></div>
 <script type="text/javascript" language="javascript">
 
 function muestraDona(dias){
     $("#tDonut").html("<h3>&Oacute;rdenes de los &uacute;ltimos " + dias + " d&iacute;as</h3>");
+    $("#hdias").val(dias);
     requestData(dias, chart, "ordenSemana");
 }
 
