@@ -506,7 +506,7 @@ class ReporteController extends ControllerBase
             $lastItem = $itemData;
         }
         
-        array_push($response, $hs);
+        //array_push($response, $hs);
         return parent::sendJson($response);
     }
     
@@ -575,5 +575,38 @@ class ReporteController extends ControllerBase
         $item = ["startAngle" => $startAngle, "endAngle" => $endAngle, "rotation" => $wheelRotate];
         
         return $item;
+    }
+    
+    /**
+     * chartDataTotalsAPIAction
+     * $days --> integer para días atras para la solicitud
+     */
+    function chartDataTotalsAPIAction($days){
+        $query = "select DATE(hinicio) Date, count(Distinct numero) totalCount from orden"
+                . " where hinicio > curdate() - interval $days day and (estado = 1 or estado = 4)"
+                . " group by DATE(hinicio)";
+        $ordenes = parent::query(new Orden(), $query);
+        $response = array();
+        
+        //obtener el más alto
+        $hightest = 0;
+        foreach ($ordenes as $h){
+            if($h->totalCount > $hightest){
+                $hightest = $h->totalCount;
+            }
+        }
+        
+        //count para crear el offset
+        $count = count($ordenes);
+        $offset = 1/$count;
+        $x = 0;
+
+        foreach ($ordenes as $o){
+            array_push($response, array('fecha' => $o->Date, 'total' => $o->totalCount, 
+                    'x' => $x, 'y' => (1 - $o->totalCount / $hightest)));
+            $x = $x + $offset;
+        }
+
+        return parent::sendJson($response);
     }
 }
