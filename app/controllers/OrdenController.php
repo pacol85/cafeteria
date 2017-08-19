@@ -95,14 +95,53 @@ class OrdenController extends ControllerBase
     			foreach ($menu as $m){
     				$cant = parent::gPost("n$m->id");
     				if($cant != null && $cant > 0){
-    					$items++;
-    					$i = new Item();
-    					$i->cantidad = $cant;
-    					$i->menu = $m->id;
-    					$i->orden = $orden->id;
-    					if(!$i->save()){
-    						parent::msg("", "db");
-    					}
+                                    
+                                    //validación si es un combo para seleccionar los items incluidos en su lugar
+                                    $combo = substr($m->codigo, 0, 1);
+                                    if($combo == "C"){
+                                        $success = true;
+                                        switch ($m->id) {
+                                            case 41:
+                                                $success = $this->addItem($cant, 2, $orden->id); //hamburguesa
+                                                $success = $this->addItem($cant, 13, $orden->id); //papas
+                                                $items++;
+                                                break;
+                                            case 42:
+                                            case 44:
+                                            case 49:
+                                                $success = $this->addItem($cant, 5, $orden->id); //Carne a la plancha
+                                                break;
+                                            case 43:
+                                            case 47:
+                                            case 52:
+                                                $success = $this->addItem($cant, 24, $orden->id); //pollo a la plancha
+                                                break;
+                                            case 45:
+                                            case 51:
+                                                $success = $this->addItem($cant, 9, $orden->id); //plato del día
+                                                break;
+                                            case 46:
+                                            case 50:
+                                                $success = $this->addItem($cant, 5, $orden->id); //hamburguesa
+                                                break;
+                                            case 48:
+                                                $success = $this->addItem($cant, 7, $orden->id); //hamburguesa
+                                                break;
+                                        }
+                                        if($success){
+                                            $items++;
+                                        }else{
+                                            parent::msg("", "db");
+                                        }
+                                        
+                                    }else{
+                                        if(!$this->addItem($cant, $m->id, $orden->id)){
+                                            parent::msg("", "db");
+                                        }else{
+                                            $items++;
+                                        }
+                                    }    					
+    					
     				}    				 
     			}
     			if($items < 1){
@@ -118,6 +157,21 @@ class OrdenController extends ControllerBase
     		parent::msg("El n&uacute;mero de orden no puede quedar en blanco");
     	}
     	parent::forward("orden", "index");
+    }
+    
+    /**
+     * Agregar item a la orden
+     */
+    public function addItem($cant, $mid, $oid){
+        $i = new Item();
+        $i->cantidad = $cant;
+        $i->menu = $mid;
+        $i->orden = $oid;
+        $result = true; //si hay exito
+        if(!$i->save()){
+            $result = false;
+        }
+        return $result;
     }
     
     /**

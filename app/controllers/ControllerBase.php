@@ -936,7 +936,7 @@ class ControllerBase extends Controller {
 		$c = 1;
 		//menu a cargar agrupado por secci�n
 		//
-		$menu = Menu::find(["order" => "seccion"]);
+		$menu = Menu::find("seccion = 1", ["order" => "seccion"]);
 		$elem = "";
 		foreach ($menu as $m){
 			
